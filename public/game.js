@@ -1,0 +1,262 @@
+var url = window.location.href;
+var gameID = url.substring(url.lastIndexOf('/') + 1);
+document.getElementById("ID").innerHTML = '<strong>Username: </strong>' + localStorage.getItem('username') + '<strong> Game ID: </strong>' + gameID;
+// console.log(gameID);
+// alert(gameID);
+var socket = io('/'),
+    $chat = $('#chatForm'),
+    $userForm = $('#userForm'),
+    $user = $('#user'),
+    $userList = $('.userList'),
+    $content = $('#main');
+
+var playerColor;
+var gamePlayerColor;
+var boardFEN;
+var gameInProgress = false;
+
+// connect users
+socket.on('startSetup', function(currentPlayerColor) {
+    console.log('a user connected');
+    console.log('Username: ' + localStorage.getItem('username'));
+    socket.emit('setup', localStorage.getItem('username'));
+});
+
+socket.on('endSetup', function(currentPlayerColor, currentBoardPosition, gamePosition) {
+    gamePlayerColor = currentPlayerColor;
+    console.log('Color: ' + gamePlayerColor);
+    boardFEN = currentBoardPosition;
+
+    //setup Chess functions
+    $(function() {
+        var board,
+            boardEl = $('#board'),
+            game = new Chess(),
+            squareClass = 'square-55d63',
+            squareToHighlight,
+            colorToHighlight;
+
+        var removeHighlights = function(color) {
+            boardEl.find('.square-55d63')
+                .removeClass('highlight-' + color);
+        };
+
+        var removeGreySquares = function() {
+            $('#board .square-55d63').css('background', '');
+        };
+
+        var greySquare = function(square) {
+            var squareEl = $('#board .square-' + square);
+
+            var background = '#a9a9a9';
+            if (squareEl.hasClass('black-3c85d') === true) {
+                background = '#696969';
+            }
+
+            squareEl.css('background-color', background);
+        };
+
+        var onDragStart = function(source, piece) {
+
+            // Not able to pick up pieces if the game is over
+            socket.emit('getColor');
+            socket.on('getColor', function(color) {
+                playerColor = color;
+            });
+
+            if (game.game_over() === true || (game.turn() === 'w' && piece.search(/^b/) !== -1) || (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+                return false;
+            }
+
+            if (playerColor === 'black' && game.turn() === 'w') { // White's turn
+                return false;
+            }
+
+            if (playerColor === 'white' && game.turn() === 'b') { // Black's turn
+                return false;
+            }
+
+
+        };
+
+        var onDrop = function(source, target) {
+            removeGreySquares();
+
+            // see if the move is legal
+            var move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q' // NOTE: always promote to a queen for example simplicity
+            });
+
+            // illegal move
+            if (move === null) return 'snapback';
+
+            socket.emit('pieceDrop', source, target);
+            socket.on('pieceDrop', function(pieceSource, pieceTarget) {
+                removeHighlights('black');
+                removeHighlights('white');
+                boardEl.find('.square-' + pieceSource).addClass('highlight-white');
+                boardEl.find('.square-' + pieceTarget).addClass('highlight-black');
+            });
+            squareToHighlight = move.to;
+
+        };
+
+        var onMouseoverSquare = function(square, piece) {
+            // get list of possible moves for this square
+            var moves = game.moves({
+                square: square,
+                verbose: true
+            });
+
+            // exit if there are no moves available for this square
+            if (moves.length === 0) return;
+
+            // highlight the square they moused over
+            greySquare(square);
+
+            // highlight the possible squares for this piece
+            for (var i = 0; i < moves.length; i++) {
+                greySquare(moves[i].to);
+            }
+        };
+
+        var onMouseoutSquare = function(square, piece) {
+            removeGreySquares();
+        };
+
+        var onSnapEnd = function() {
+            board.position(game.fen());
+            socket.emit('chessMove', board.fen(), game.fen());
+
+            if (game.in_checkmate()) {
+                socket.emit('gameInCheckmate');
+            } else if (game.in_check()) {
+                socket.emit('gameInCheck');
+            } else if (game.in_threefold_repetition()) {
+                socket.emit('gameInThreefold');
+            } else if (game.in_stalemate()) {
+                socket.emit('gameInStalemate');
+            } else if (game.in_draw()) {
+                socket.emit('gameInDraw');
+            }
+        };
+
+        var cfg = {
+            draggable: true,
+            position: boardFEN,
+            orientation: gamePlayerColor,
+            onDragStart: onDragStart,
+            onDrop: onDrop,
+            onMouseoutSquare: onMouseoutSquare,
+            onMouseoverSquare: onMouseoverSquare,
+            onSnapEnd: onSnapEnd
+        };
+
+        board = new ChessBoard('board', cfg);
+        // game.load(gamePosition);
+
+        socket.on('chessMove', function(boardPosition, gamePosition) {
+            board.position(boardPosition);
+            // console.log(gamePosition);
+            game.load(gamePosition);
+        });
+
+        socket.on('offensiveCheck', function() {
+            swal("Check!", "You put your opponent in check! Keep up the attack!", "success");
+        });
+
+        socket.on('defensiveCheck', function() {
+            swal("Check!", "Your opponent is on the attack! Move or defend your King!", "error");
+        });
+
+        socket.on('offensiveCheckmate', function() {
+            swal("Checkmate!", "You have trapped the opposing king. You won this game!", "success");
+        });
+
+        socket.on('defensiveCheckmate', function() {
+            swal("Checkmate!", "Your king is trapped! You lose this game.", "error");
+        });
+
+        socket.on('offensiveStalemate', function() {
+            swal("Stalemate!", "You let your opponent sneak away with a draw. Better luck next game!", "warning")
+        });
+
+        socket.on('defensiveStalemate', function() {
+            swal("Stalemate!", "You swindled your opponent's chance for a win. Well played!", "warning")
+        });
+
+        socket.on('drawGame', function() {
+            swal('Draw!', 'This game has resulted in a draw! Play another round!', 'warning');
+        });
+
+        socket.on('threeFoldDraw', function() {
+            swal('Draw!', 'You and your opponent repeated the same move 3 times rather than fighting with honor.', 'warning');
+        })
+
+    }); // end chess js
+}); // end socket startup
+
+
+
+
+// $chat.submit(function(e) {
+//     e.preventDefault();
+//     socket.emit('chat message', $('#m').val());
+//     socket.emit('userNotTyping');
+//     $('#messages').append($('<p>').addClass('me').text($('#m').val()));
+//     $('#m').val('');
+//     return false;
+// });
+//
+// //User Typing Trigger
+// $('#m').keypress($.debounce(5000, true, function() {
+//     console.log('keypress');
+//     socket.emit('userTyping');
+// })).keypress($.debounce(5000, function() {
+//     socket.emit('userNotTyping');
+// }));
+
+// socket.on('chat message', function(msg, userName) {
+//     console.log('chat message', msg, userName);
+//     $('#messages').append($('<p>').addClass('them').text(userName + ': ' + msg));
+//     socket.emit('scrollChat');
+// });
+//
+//
+//
+//
+//
+// //Alert Connects and Disconnects
+// socket.on('userConnect', function(alert) {
+//     $('#messages').append($('<li>').text(alert).addClass('connect-alert'));
+//
+// });
+// socket.on('userDisconnect', function(alert) {
+//     $('#messages').append($('<li>').text(alert).addClass('disconnect-alert'));
+// });
+// socket.on('updateUsers', function(users) {
+//     var html = $.map(users, function(user) {
+//         console.log(user);
+//         return user + '<br>'
+//     });
+//     $userList.html(html);
+// });
+//
+//Send Message Function
+//
+// socket.on('userTyping', function(alert) {
+//     $('#messages').append($('<p>').text(alert).addClass('user-typing'));
+//     socket.emit('scrollChat');
+// });
+// socket.on('userNotTyping', function() {
+//     $('.user-typing').css('display', 'none');
+// });
+// socket.on('scrollChat', function() {
+//     //autoscroll chatbox
+//     var newscrollHeight = $("#messages").prop("scrollHeight") - 25; //Scroll height after the request
+//     $("#messages").animate({
+//         scrollTop: newscrollHeight
+//     }, 'normal'); //Autoscroll to bottom of div
+// });

@@ -1,0 +1,10 @@
+{
+  "name": "socket-chat-example",
+  "version": "1.0.0",
+  "description": "Simple chess game",
+  "dependencies": {
+    "express": "*",
+    "lodash": "*",
+    "socket.io": "*"
+  }
+}

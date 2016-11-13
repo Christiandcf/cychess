@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Force latest available IE rendering engine and Chrome Frame (if installed) -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Chesstards</title>
+    <link rel="shortcut icon" type="image/png" href="/img/favicon.ico" />
+    <script src="/socket.io/socket.io.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+    <link rel="stylesheet" href="sweet-alert.css">
+    <link rel="stylesheet" href="chessboard.css">
+    <link rel="stylesheet" href="kraken.min.css">
+    <link rel="stylesheet" href="main.css">
+
+
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <body background="img/background.jpg">
+
+
+
+            <h1 id="mainT"><img class="logo" src="img/banner.png" alt="banner"></h1>
+
+            <!-- <div id="menu"> -->
+            <div id="btns" align="center" class="row">
+                <button class="btn btn-default" onclick="showMenu();">Menu</button>
+                <button class="btn btn-default" onclick="showCreate();">Create</button>
+                <button class="btn btn-default" onclick="showJoin();">Join</button>
+                <button class="btn btn-default" onclick="showChatBox();">Chat</button>
+            </div>
+
+            <div id="logo">
+                <img class="logo" src="img/logo.png" alt="logo">
+            </div>
+
+            <div id="createBox" class="modal">
+                <form id="userForm" action="">
+                  <h1>Enter Username:</h1>
+
+                    <input id="userName" class="form-control"><button class="btn btn-default">Submit</button>
+                </form>
+            </div>
+
+            <div id="joinBox" class="modal">
+              <form id="gameForm" action="">
+
+                <h1>Enter Username:</h1>
+                <input id="joinUserName" class="form-control" type="text">
+                <h1>Enter Game ID:</h1>
+                    <input id="gameCode" class="form-control" type="text"><button class="btn btn-default">Submit</button>
+                </form>
+            </div>
+
+            <!-- CHAT -->
+
+            <div id="chatBox" align="center" class="row" style="padding-top:3%">
+                <div id="userFormArea" class="row">
+                    <div class="cold-md-8">
+                        <form id="userForm">
+                            <div class="form-group">
+                                <h1><b> Enter Username: </b></h1>
+                                <input class="form-control" id="userN"></input>
+                                <div id="emptU" style="color:red"></div>
+                                <br/>
+                                <button id="loginBtn" class="btn btn-default">Log in</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="messageArea" class="row">
+                  <div class="col-md-2"></div>
+                    <div class="col-md-4">
+                        <!-- Space for the messages -->
+                        <div class="chat" id="msgBox">
+
+                        </div>
+
+
+                    </div>
+                    <div class="col-md-4">
+                        <div class="well">
+                            <h3>Online users</h3>
+                            <ul class="list-group" id="users">
+
+                            </ul>
+                        </div>
+                        <form id="messageForm">
+                            <div class="well">
+                                <label> Enter Message</label>
+                                <textarea class="form-control" id="message"></textarea>
+                                <br />
+                                <button id="msgBtn" class="btn btn-default">Send</button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+    </div>
+
+
+
+    <!-- Javascript -->
+    <script src='jquery.throttleDebounce.js'></script>
+    <script src='sweet-alert.min.js'></script>
+    <script src='main.js'></script>
+    <script src='chat.js'></script>
+
+
+
+
+    </body>
+
+</html>
