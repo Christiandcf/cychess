@@ -30,8 +30,6 @@
 
         <body background="img/background.jpg">
 
-
-
             <h1 id="mainT"><img class="logo" src="img/banner.png" alt="banner"></h1>
 
             <!-- <div id="menu"> -->
@@ -46,27 +44,28 @@
                 <img class="logo" src="img/logo.png" alt="logo">
             </div>
 
+            <!-- Create a Game -->
             <div id="createBox" class="modal">
                 <form id="userForm" action="">
-                  <h1>Enter Username:</h1>
-
+                    <h1>Enter Username:</h1>
                     <input id="userName" class="form-control"><button class="btn btn-default">Submit</button>
                 </form>
             </div>
 
+            <!-- Join Existing Game -->
             <div id="joinBox" class="modal">
-              <form id="gameForm" action="">
-
-                <h1>Enter Username:</h1>
-                <input id="joinUserName" class="form-control" type="text">
-                <h1>Enter Game ID:</h1>
+                <form id="gameForm" action="">
+                    <h1>Enter Username:</h1>
+                    <input id="joinUserName" class="form-control" type="text">
+                    <h1>Enter Game ID:</h1>
                     <input id="gameCode" class="form-control" type="text"><button class="btn btn-default">Submit</button>
                 </form>
             </div>
 
             <!-- CHAT -->
-
             <div id="chatBox" align="center" class="row" style="padding-top:3%">
+
+                <!-- Log in -->
                 <div id="userFormArea" class="row">
                     <div class="cold-md-8">
                         <form id="userForm">
@@ -81,8 +80,9 @@
                     </div>
                 </div>
 
+                <!-- Message Area -->
                 <div id="messageArea" class="row">
-                  <div class="col-md-2"></div>
+                    <div class="col-md-2"></div>
                     <div class="col-md-4">
                         <!-- Space for the messages -->
                         <div class="chat" id="msgBox">
@@ -113,16 +113,11 @@
     </div>
 
 
-
     <!-- Javascript -->
     <script src='jquery.throttleDebounce.js'></script>
     <script src='sweet-alert.min.js'></script>
     <script src='main.js'></script>
     <script src='chat.js'></script>
 
-
-
-
     </body>
-
 </html>

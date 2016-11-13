@@ -7,15 +7,15 @@ var _ = require('lodash');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
-users = [];
-connections = [];
+users = []; // Constains Users for chat
+connections = [];  // Number of sockets
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-//set up cookies and session vars to pass around routes
+// Cookie Set up
 app.use(cookieParser());
 app.use(session({secret:'somesecrettokenhere'}));
 
@@ -32,7 +32,6 @@ app.get('/favicon.ico', function(req, res) {
 
 
 // Game & User constructor functions
-
 function userList() {
 	this.users = [];
 }
@@ -61,7 +60,6 @@ function gamesCollection() {
 	this.games = [];
 };
 
-// Accepts both players
 function game(id, player1, player2) {
 	this.id = id;
 	this.players = [];
@@ -129,15 +127,6 @@ gamesCollection.prototype.joinGame = function(gameId, player2userName) {
 	}
 
 
-	// if (currentGame.users.length == 'white' && currentGame.white == undefined) {
-	// 	currentGame.white = sideColor;
-	// }
-	// else if (sideColor == 'black' && currentGame.black == undefined) {
-	// 	currentGame.black = sideColor;
-	// }
-	// else {
-	// 	alert('this game is full');
-	// }
 }
 
 var gamesCollection = new gamesCollection();
@@ -151,19 +140,14 @@ var createID = function () {
 app.post('/create', function(req, res) {
 
 	if (userList.findUser(req.body.userName, 'un')) {
-		// console.log('username already exists');
 		res.send(false);
 	}
 	else {
 		userList.newUser(req.body.userName); // add user to userList
 		var randID = createID();
 		gamesCollection.newGame(randID, 'white', req.body.userName);
-		// console.log(gamesCollection);
-		//req.body is data object
 		req.session.gameId = randID;
-		// req.session.userName = req.body.userName;
 		res.redirect('/create');
-		// res.send(req.body);
 	}
 });
 
@@ -207,18 +191,14 @@ app.get('/create', function (req, res) {
 });
 
 app.get('/game/:gameID', function (req, res, next) {
-	// console.log(req.params);
 	var gameID = req.params.gameID;
 	res.sendFile(__dirname + '/game.html');
 
-	// var joiningUser = userList.findUser(req.session.userName);
-	// joiningUser.socket = socket.id;/\
-	// console.log(userList);
 });
 
 
 /*
-* Socket IO Stuff!
+* Socket IO Receiving!
 */
 io.sockets.on('connection', function(socket){
   connections.push(socket);
@@ -263,22 +243,7 @@ io.sockets.on('connection', function(socket){
 		currentGame.gameFEN = gamePosition;
 		io.emit('chessMove', boardPosition, gamePosition);
 	});
-  //
-	// socket.on('chat message', function(msg) {
-	// 	var currentUser = userList.findUser(socket.id, 'id');
-	// 	socket.broadcast.emit('chat message', msg, currentUser.userName);
-	// });
-  //
-	//  socket.on('userTyping', function(){
-	//  	var currentUser = userList.findUser(socket.id, 'id');
-	// 	socket.broadcast.emit('userTyping', currentUser.userName + ' is typing...');
-	// });
-	// socket.on('userNotTyping', function(){
-	// 	io.emit('userNotTyping');
-	// });
-	// socket.on('scrollChat', function() {
-	// 	io.emit('scrollChat');
-	// });
+
 
 	socket.on('pieceDrop', function(pieceSource, pieceTarget) {
 		io.emit('pieceDrop', pieceSource, pieceTarget);

@@ -30,11 +30,15 @@
         <button class="btn btn-default" style="background-color:red" onclick="goHome();">Home</button>
         <p id="ID"></p>
 
-        <!-- CHAT -->
+
         <div class="col-md-2"></div>
+
+        <!-- Board -->
         <div class="col-md-4">
             <div id="board"></div>
         </div>
+
+        <!-- CHAT -->
         <div class="col-md-4" align="center">
           <h2 align="center">Chat</h2>
             <div class="chat" id="msgBoxG"></div>
@@ -53,10 +57,11 @@
 
     <!-- Javascript -->
     <script>
-        function goHome() {
+        function goHome() { // redirects to home.
             window.location.href = 'http://localhost:3000';
         };
     </script>
+
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script src='../jquery.throttleDebounce.js'></script>
     <script src='../sweet-alert.min.js'></script>

@@ -13,9 +13,6 @@ var $logo = $('#logo');
 
 var room = location.pathname.slice(1);;
 
-
-
-
 // show Create
 function showCreate() {
 		$createBox.show();
@@ -80,8 +77,8 @@ $gameForm.submit(function(e) {
 	newUserData.gameId = $('#gameCode').val();
 
 	$.post('/join', newUserData, function(userData) {
-		// if post is successful redirect
-		localStorage.setItem("username", newUserData.userName);
+		// Redirect to game
+		localStorage.setItem("username", newUserData.userName); // locates the user
 		window.location = '/game/' + newUserData.gameId;
 
 	}).fail(function(xhr) {

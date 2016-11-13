@@ -1,0 +1,12 @@
+Please emphasize on the following file:
+
+  - index.html: Contains both views for the log in to the chess and the fully functional chat
+  - game.html: Contains the chessboard, it will display the Game ID to allow players to connect
+  - index.js: Server side of the application, receives playable moves, messages, and all the information sent by the client
+  - main.js: Navigation logic on the main page
+  - chat.js: The main chat logic, sends information to server with the messages so it can get displayed to other students
+  - chatGame.js: Chat tailored to meet specific specifications on the game.html (ex: not having to log in again)
+
+If any issues please feel free to email:
+cdcf@iastate.edu
+faizulj@iastate.edu

@@ -18,7 +18,7 @@ function showChatBox1(){
 
 $(function() {
 
-    // Sets Username
+    // Sets Username as soon as the page loads
     $(document).ready(function(e) {
           $user = localStorage.getItem('username');
             socket.emit('new user', $user, function(data) {
